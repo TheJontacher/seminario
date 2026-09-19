@@ -1,0 +1,32 @@
+<aside class="app-sidebar" aria-label="Navegación principal">
+    <div class="sidebar-brand">
+        <span class="brand-mark">TS</span>
+        <span>Taller<span class="brand-accent">Service</span></span>
+    </div>
+    <nav class="sidebar-nav">
+        <a class="sidebar-link active" href="{% url 'home' %}">
+            <span class="sidebar-icon">⌂</span>
+            Dashboard
+        </a>
+        <a class="sidebar-link {% if request.resolver_match.namespace == 'owners' %}active{% endif %}" href="{% url 'owners:list' %}">
+            <span class="sidebar-icon">P</span>
+            Propietarios
+        </a>
+        <a class="sidebar-link {% if request.resolver_match.namespace == 'vehicles' %}active{% endif %}" href="{% url 'vehicles:list' %}">
+            <span class="sidebar-icon">V</span>
+            Vehículos
+        </a>
+        <a class="sidebar-link" href="#">
+            <span class="sidebar-icon">O</span>
+            Órdenes de servicio
+        </a>
+        <a class="sidebar-link" href="#">
+            <span class="sidebar-icon">M</span>
+            Mecánicos
+        </a>
+        <a class="sidebar-link" href="#">
+            <span class="sidebar-icon">H</span>
+            Historial
+        </a>
+    </nav>
+</aside>

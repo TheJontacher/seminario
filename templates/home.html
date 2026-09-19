@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | TallerService{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+    <div>
+        <p class="eyebrow mb-1">Resumen operativo</p>
+        <h2 class="page-title">Dashboard</h2>
+    </div>
+    <p class="page-date mb-0">Estado actual del taller</p>
+</section>
+
+<section class="metrics-grid" aria-label="Métricas del taller">
+    <article class="metric-card metric-card-blue">
+        <p class="metric-label">Propietarios</p>
+        <p class="metric-value">{{ total_owners }}</p>
+        <p class="metric-caption">Registrados en el sistema</p>
+    </article>
+    <article class="metric-card metric-card-teal">
+        <p class="metric-label">Vehículos</p>
+        <p class="metric-value">{{ total_vehicles }}</p>
+        <p class="metric-caption">Unidades asociadas</p>
+    </article>
+    <article class="metric-card metric-card-amber">
+        <p class="metric-label">Órdenes recibidas</p>
+        <p class="metric-value">{{ order_metrics.received }}</p>
+        <p class="metric-caption">Pendientes de atención</p>
+    </article>
+    <article class="metric-card metric-card-violet">
+        <p class="metric-label">En proceso</p>
+        <p class="metric-value">{{ order_metrics.in_progress }}</p>
+        <p class="metric-caption">Trabajo en curso</p>
+    </article>
+    <article class="metric-card metric-card-orange">
+        <p class="metric-label">Detenidas</p>
+        <p class="metric-value">{{ order_metrics.stopped }}</p>
+        <p class="metric-caption">Esperando repuestos</p>
+    </article>
+    <article class="metric-card metric-card-green">
+        <p class="metric-label">Terminadas</p>
+        <p class="metric-value">{{ order_metrics.finished }}</p>
+        <p class="metric-caption">Listas para entregar</p>
+    </article>
+</section>
+{% endblock %}

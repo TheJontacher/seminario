@@ -1,0 +1,31 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Taller{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{% load static %}{% static 'css/app.css' %}" rel="stylesheet">
+</head>
+<body class="app-body">
+    {% if user.is_authenticated %}
+        <div class="app-shell">
+            {% include "components/sidebar.html" %}
+            <div class="app-main">
+                {% include "components/header.html" %}
+                <main class="content-area">
+    {% else %}
+        <main class="auth-main">
+    {% endif %}
+    {% if user.is_authenticated %}
+        {% include "components/messages.html" %}
+    {% endif %}
+    {% block content %}{% endblock %}
+    </main>
+    {% if user.is_authenticated %}
+            </div>
+        </div>
+    {% endif %}
+</body>
+</html>

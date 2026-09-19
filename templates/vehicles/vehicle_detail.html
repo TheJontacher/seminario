@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}{{ vehicle.placa }} | TallerService{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+    <div>
+        <p class="eyebrow mb-1">Detalle del vehículo</p>
+        <h2 class="page-title">{{ vehicle.placa }}</h2>
+    </div>
+    <div class="d-flex gap-2">
+        <a class="btn btn-outline-secondary" href="{% url 'vehicles:list' %}">Volver</a>
+        <a class="btn btn-primary" href="{% url 'vehicles:update' vehicle.pk %}">Editar</a>
+    </div>
+</section>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <h3 class="h5 mb-4">Datos del vehículo</h3>
+                <dl class="row mb-0">
+                    <dt class="col-sm-5 text-secondary">Placa</dt>
+                    <dd class="col-sm-7">{{ vehicle.placa }}</dd>
+                    <dt class="col-sm-5 text-secondary">Tipo</dt>
+                    <dd class="col-sm-7">{{ vehicle.tipo }}</dd>
+                    <dt class="col-sm-5 text-secondary">Marca / modelo</dt>
+                    <dd class="col-sm-7">{{ vehicle.marca }} {{ vehicle.modelo }}</dd>
+                    <dt class="col-sm-5 text-secondary">Año</dt>
+                    <dd class="col-sm-7">{{ vehicle.anio }}</dd>
+                    <dt class="col-sm-5 text-secondary">Kilometraje</dt>
+                    <dd class="col-sm-7">{{ vehicle.kilometraje_actual }}</dd>
+                    <dt class="col-sm-5 text-secondary">Fecha de ingreso</dt>
+                    <dd class="col-sm-7">{{ vehicle.fecha_ingreso }}</dd>
+                    <dt class="col-sm-5 text-secondary">Estado</dt>
+                    <dd class="col-sm-7">{{ vehicle.estado }}</dd>
+                    <dt class="col-sm-5 text-secondary">Perfil de uso</dt>
+                    <dd class="col-sm-7">{{ vehicle.get_perfil_uso_display }}</dd>
+                    <dt class="col-sm-5 text-secondary">Observaciones</dt>
+                    <dd class="col-sm-7">{{ vehicle.observaciones|default:"-" }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <h3 class="h5 mb-4">Propietario</h3>
+                <p class="mb-1 fw-semibold">{{ vehicle.owner.nombre }}</p>
+                <p class="mb-0 text-secondary">{{ vehicle.owner.telefono }}{% if vehicle.owner.email %} · {{ vehicle.owner.email }}{% endif %}</p>
+            </div>
+        </div>
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h3 class="h5 mb-4">Historial de órdenes</h3>
+                {% if vehicle.service_orders.all %}
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead><tr><th>Fecha</th><th>Kilometraje</th><th>Estado</th></tr></thead>
+                            <tbody>
+                                {% for order in vehicle.service_orders.all %}
+                                    <tr>
+                                        <td>{{ order.fecha_ingreso }}</td>
+                                        <td>{{ order.kilometraje_ingreso }}</td>
+                                        <td>{{ order.get_estado_display }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-secondary mb-0">No hay órdenes relacionadas.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

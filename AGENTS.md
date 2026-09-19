@@ -1,0 +1,22 @@
+# Reglas del proyecto
+
+- Antes de modificar codigo, revisar la estructura existente.
+- Hacer cambios pequenos y acotados.
+- No refactorizar modulos no relacionados con la tarea.
+- No duplicar logica existente.
+- Django debe manejar backend y vistas.
+- PostgreSQL sera la base de datos.
+- Bootstrap sera usado para la interfaz.
+- Organizar el sistema por modulos funcionales.
+- Mantener nombres claros y codigo sencillo.
+- Priorizar mantenibilidad sobre patrones innecesariamente complejos.
+- No implementar inventario.
+- No implementar facturacion.
+- No implementar contabilidad.
+- No implementar nomina.
+- No implementar Kubernetes.
+- No integrar todavia APIs reales de WhatsApp/SMS.
+- Los recordatorios inicialmente seran internos y mediante enlaces wa.me.
+- No construir funcionalidades que no hayan sido solicitadas.
+- Despues de cada cambio verificar que el proyecto siga ejecutandose.
+- No modificar archivos ajenos a la tarea salvo que sea estrictamente necesario.

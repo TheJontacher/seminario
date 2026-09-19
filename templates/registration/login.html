@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Iniciar sesión | Taller{% endblock %}
+
+{% block content %}
+<main class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <h1 class="h3 mb-4">Iniciar sesión</h1>
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label" for="id_username">Usuario</label>
+                    <input class="form-control{% if form.username.errors %} is-invalid{% endif %}"
+                           type="text" name="username" id="id_username" required autofocus>
+                    {% for error in form.username.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="id_password">Contraseña</label>
+                    <input class="form-control{% if form.password.errors %} is-invalid{% endif %}"
+                           type="password" name="password" id="id_password" required>
+                    {% for error in form.password.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <button class="btn btn-primary" type="submit">Iniciar sesión</button>
+            </form>
+        </div>
+    </div>
+</main>
+{% endblock %}

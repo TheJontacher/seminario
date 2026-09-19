@@ -1,0 +1,13 @@
+<header class="app-header">
+    <div>
+        <p class="eyebrow mb-1">Panel de trabajo</p>
+        <h1 class="system-name mb-0">Control de servicios</h1>
+    </div>
+    <div class="user-menu">
+        <span class="user-name">{{ user.get_username }}</span>
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button class="btn btn-outline-secondary btn-sm" type="submit">Cerrar sesión</button>
+        </form>
+    </div>
+</header>

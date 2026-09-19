@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}{{ owner.nombre }} | TallerService{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+    <div>
+        <p class="eyebrow mb-1">Detalle del propietario</p>
+        <h2 class="page-title">{{ owner.nombre }}</h2>
+    </div>
+    <div class="d-flex gap-2">
+        <a class="btn btn-outline-secondary" href="{% url 'owners:list' %}">Volver</a>
+        <a class="btn btn-primary" href="{% url 'owners:update' owner.pk %}">Editar</a>
+    </div>
+</section>
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <h3 class="h5 mb-4">Datos completos</h3>
+                <dl class="row mb-0">
+                    <dt class="col-sm-5 text-secondary">Tipo</dt>
+                    <dd class="col-sm-7">{{ owner.get_tipo_display }}</dd>
+                    <dt class="col-sm-5 text-secondary">Teléfono</dt>
+                    <dd class="col-sm-7">{{ owner.telefono }}</dd>
+                    <dt class="col-sm-5 text-secondary">Email</dt>
+                    <dd class="col-sm-7">{{ owner.email|default:"-" }}</dd>
+                    <dt class="col-sm-5 text-secondary">Dirección</dt>
+                    <dd class="col-sm-7">{{ owner.direccion|default:"-" }}</dd>
+                    <dt class="col-sm-5 text-secondary">Estado</dt>
+                    <dd class="col-sm-7">{% if owner.activo %}Activo{% else %}Inactivo{% endif %}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="h5 mb-0">Vehículos asociados</h3>
+                    <span class="badge text-bg-light">{{ owner.vehicles.count }}</span>
+                </div>
+                {% if owner.vehicles.all %}
+                    <div class="list-group list-group-flush">
+                        {% for vehicle in owner.vehicles.all %}
+                            <div class="list-group-item px-0">
+                                <div class="fw-semibold">{{ vehicle.placa }}</div>
+                                <div class="small text-secondary">{{ vehicle.marca }} {{ vehicle.modelo }} · {{ vehicle.anio }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-secondary mb-0">No hay vehículos asociados.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
