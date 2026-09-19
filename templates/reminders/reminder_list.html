@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Recordatorios | TallerService{% endblock %}
+
+{% block content %}
+<section class="page-heading"><div><p class="eyebrow mb-1">Seguimiento</p><h2 class="page-title">Recordatorios</h2></div><a class="btn btn-primary" href="{% url 'reminders:create' %}">Nuevo recordatorio</a></section>
+<div class="card border-0 shadow-sm">
+    <div class="card-body border-bottom">
+        <form class="row g-2" method="get">
+            <div class="col-md-3"><label class="visually-hidden" for="reminder-status">Estado</label><select class="form-select" id="reminder-status" name="estado"><option value="">Todos los estados</option>{% for value, label in status_choices %}<option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+            <div class="col-md-3"><label class="visually-hidden" for="reminder-plate">Placa</label><input class="form-control" id="reminder-plate" name="placa" value="{{ plate }}" placeholder="Placa"></div>
+            <div class="col-md-4"><label class="visually-hidden" for="reminder-owner">Propietario</label><input class="form-control" id="reminder-owner" name="propietario" value="{{ owner_search }}" placeholder="Propietario"></div>
+            <div class="col-auto"><button class="btn btn-outline-primary" type="submit">Filtrar</button></div>
+            {% if status or plate or owner_search %}<div class="col-auto"><a class="btn btn-link" href="{% url 'reminders:list' %}">Limpiar</a></div>{% endif %}
+        </form>
+    </div>
+    <div class="table-responsive"><table class="table align-middle mb-0">
+        <thead><tr><th>Fecha programada</th><th>Propietario</th><th>Vehículo</th><th>Servicio</th><th>Teléfono</th><th>Estado</th><th class="text-end">Acciones</th></tr></thead>
+        <tbody>{% for reminder in reminders %}<tr>
+            <td class="fw-semibold">{{ reminder.fecha_programada }}</td><td>{{ reminder.maintenance_schedule.vehicle.owner.nombre }}</td><td>{{ reminder.maintenance_schedule.vehicle.placa }}</td><td>{{ reminder.maintenance_schedule.nombre_servicio }}</td><td>{{ reminder.maintenance_schedule.vehicle.owner.telefono }}</td>
+            <td>{% if reminder.estado == 'PENDIENTE' %}<span class="badge text-bg-warning">PENDIENTE</span>{% elif reminder.estado == 'CONTACTADO' %}<span class="badge text-bg-info">CONTACTADO</span>{% elif reminder.estado == 'COMPLETADO' %}<span class="badge text-bg-success">COMPLETADO</span>{% else %}<span class="badge text-bg-secondary">CANCELADO</span>{% endif %}</td>
+            <td class="text-end text-nowrap"><a class="btn btn-sm btn-outline-secondary" href="{% url 'reminders:detail' reminder.pk %}">Ver</a> <a class="btn btn-sm btn-outline-primary" href="{% url 'reminders:update' reminder.pk %}">Editar</a></td>
+        </tr>{% empty %}<tr><td colspan="7" class="text-center text-secondary py-5">No hay recordatorios registrados.</td></tr>{% endfor %}</tbody>
+    </table></div>
+</div>
+{% endblock %}

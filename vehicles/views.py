@@ -45,7 +45,9 @@ def vehicle_create(request):
 @login_required
 def vehicle_detail(request, pk):
 	vehicle = get_object_or_404(
-		Vehicle.objects.select_related("owner").prefetch_related("service_orders"),
+		Vehicle.objects.select_related("owner").prefetch_related(
+			"service_orders", "maintenance_schedules"
+		),
 		pk=pk,
 	)
 	return render(request, "vehicles/vehicle_detail.html", {"vehicle": vehicle})

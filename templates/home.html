@@ -42,5 +42,47 @@
         <p class="metric-value">{{ order_metrics.finished }}</p>
         <p class="metric-caption">Listas para entregar</p>
     </article>
+    <article class="metric-card metric-card-orange">
+        <p class="metric-label">Mantenimientos vencidos</p>
+        <p class="metric-value">{{ overdue_maintenance }}</p>
+        <p class="metric-caption">Requieren atención</p>
+    </article>
+    <article class="metric-card metric-card-amber">
+        <p class="metric-label">Mantenimientos próximos</p>
+        <p class="metric-value">{{ upcoming_maintenance }}</p>
+        <p class="metric-caption">Dentro del umbral preventivo</p>
+    </article>
+    <article class="metric-card metric-card-blue">
+        <p class="metric-label">Recordatorios pendientes</p>
+        <p class="metric-value">{{ pending_reminders }}</p>
+        <p class="metric-caption">Seguimientos por realizar</p>
+    </article>
+</section>
+
+<section class="card border-0 shadow-sm mt-4">
+    <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="h5 mb-0">Alertas de mantenimiento</h3>
+            <a class="btn btn-sm btn-outline-primary" href="{% url 'maintenance:list' %}">Ver todos</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead><tr><th>Placa</th><th>Propietario</th><th>Servicio</th><th>Próximo vencimiento</th><th>Estado</th></tr></thead>
+                <tbody>
+                    {% for schedule in priority_maintenance %}
+                        <tr>
+                            <td class="fw-semibold"><a href="{% url 'maintenance:detail' schedule.pk %}">{{ schedule.vehicle.placa }}</a></td>
+                            <td>{{ schedule.vehicle.owner.nombre }}</td>
+                            <td>{{ schedule.nombre_servicio }}</td>
+                            <td>{% if schedule.proxima_fecha %}{{ schedule.proxima_fecha }}{% elif schedule.proximo_kilometraje %}{{ schedule.proximo_kilometraje }} km{% else %}-{% endif %}</td>
+                            <td>{% if schedule.calculated_status == 'VENCIDO' %}<span class="badge text-bg-danger">VENCIDO</span>{% elif schedule.calculated_status == 'PROXIMO' %}<span class="badge text-bg-warning">PROXIMO</span>{% else %}<span class="badge text-bg-success">AL_DIA</span>{% endif %}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="5" class="text-center text-secondary py-4">No hay mantenimientos programados.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </section>
 {% endblock %}

@@ -26,6 +26,8 @@ INSTALLED_APPS = [
     "owners",
     "vehicles",
     "service_orders",
+    "maintenance",
+    "reminders",
 ]
 
 MIDDLEWARE = [

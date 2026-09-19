@@ -14,5 +14,7 @@ urlpatterns = [
     path("propietarios/", include("owners.urls")),
     path("vehiculos/", include("vehicles.urls")),
     path("ordenes/", include("service_orders.urls")),
+    path("mantenimiento/", include("maintenance.urls")),
+    path("recordatorios/", include("reminders.urls")),
     path("", include("core.urls")),
 ]

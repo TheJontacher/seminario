@@ -73,6 +73,33 @@
                 {% endif %}
             </div>
         </div>
+        <div class="card border-0 shadow-sm mt-4">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="h5 mb-0">Mantenimiento preventivo</h3>
+                    <a class="btn btn-sm btn-outline-primary" href="{% url 'maintenance:create' %}?vehicle={{ vehicle.pk }}">Nuevo mantenimiento</a>
+                </div>
+                {% if vehicle.maintenance_schedules.all %}
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead><tr><th>Servicio</th><th>Próximo km</th><th>Próxima fecha</th><th>Estado</th></tr></thead>
+                            <tbody>
+                                {% for schedule in vehicle.maintenance_schedules.all %}
+                                    <tr>
+                                        <td><a href="{% url 'maintenance:detail' schedule.pk %}">{{ schedule.nombre_servicio }}</a></td>
+                                        <td>{{ schedule.proximo_kilometraje|default:"-" }}</td>
+                                        <td>{{ schedule.proxima_fecha|default:"-" }}</td>
+                                        <td><span class="badge text-bg-light">{{ schedule.status }}</span></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-secondary mb-0">No hay planes de mantenimiento asociados.</p>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

@@ -20,8 +20,16 @@
             <span class="sidebar-icon">O</span>
             Órdenes de servicio
         </a>
-        <a class="sidebar-link" href="#">
+        <a class="sidebar-link {% if request.resolver_match.namespace == 'maintenance' %}active{% endif %}" href="{% url 'maintenance:list' %}">
             <span class="sidebar-icon">M</span>
+            Mantenimiento
+        </a>
+        <a class="sidebar-link {% if request.resolver_match.namespace == 'reminders' %}active{% endif %}" href="{% url 'reminders:list' %}">
+            <span class="sidebar-icon">R</span>
+            Recordatorios
+        </a>
+        <a class="sidebar-link" href="#">
+            <span class="sidebar-icon">T</span>
             Mecánicos
         </a>
         <a class="sidebar-link" href="#">
