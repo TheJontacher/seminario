@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Orden #{{ order.pk }} | TallerService{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+    <div>
+        <p class="eyebrow mb-1">Detalle de orden</p>
+        <h2 class="page-title">Orden #{{ order.pk }}</h2>
+    </div>
+    <div class="d-flex gap-2">
+        <a class="btn btn-outline-secondary" href="{% url 'service_orders:list' %}">Volver</a>
+        {% if order.estado != 'ENTREGADO' %}
+            <a class="btn btn-primary" href="{% url 'service_orders:update' order.pk %}">Editar orden</a>
+        {% endif %}
+    </div>
+</section>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="h5 mb-0">Datos de la orden</h3>
+                    <span class="badge text-bg-primary">{{ order.get_estado_display }}</span>
+                </div>
+                <dl class="row mb-0">
+                    <dt class="col-sm-5 text-secondary">Vehículo</dt>
+                    <dd class="col-sm-7">{{ order.vehicle.placa }} · {{ order.vehicle.marca }} {{ order.vehicle.modelo }}</dd>
+                    <dt class="col-sm-5 text-secondary">Propietario</dt>
+                    <dd class="col-sm-7">{{ order.vehicle.owner.nombre }}</dd>
+                    <dt class="col-sm-5 text-secondary">Mecánico</dt>
+                    <dd class="col-sm-7">{{ order.mechanic|default:"Sin asignar" }}</dd>
+                    <dt class="col-sm-5 text-secondary">Fecha de ingreso</dt>
+                    <dd class="col-sm-7">{{ order.fecha_ingreso }}</dd>
+                    <dt class="col-sm-5 text-secondary">Kilometraje</dt>
+                    <dd class="col-sm-7">{{ order.kilometraje_ingreso }}</dd>
+                    <dt class="col-sm-5 text-secondary">Motivo</dt>
+                    <dd class="col-sm-7">{{ order.motivo_ingreso }}</dd>
+                    <dt class="col-sm-5 text-secondary">Observaciones</dt>
+                    <dd class="col-sm-7">{{ order.observaciones|default:"-" }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <h3 class="h5 mb-3">Acciones</h3>
+                <div class="d-flex flex-wrap gap-2">
+                    {% if order.estado != 'ENTREGADO' %}
+                        <a class="btn btn-outline-primary" href="{% url 'service_orders:update' order.pk %}">Editar orden</a>
+                        <a class="btn btn-outline-success" href="{% url 'service_orders:service_create' order.pk %}">Agregar servicio</a>
+                        <a class="btn btn-outline-warning" href="{% url 'service_orders:status_update' order.pk %}">Cambiar estado</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h3 class="h5 mb-4">Servicios realizados</h3>
+                {% for service in order.services_performed.all %}
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-2">
+                            <thead><tr><th>Nombre</th><th>Descripción</th><th>Observaciones</th><th>Preventivo</th></tr></thead>
+                            <tbody>
+                                <tr>
+                                    <td class="fw-semibold">{{ service.nombre }}</td>
+                                    <td>{{ service.descripcion|default:"-" }}</td>
+                                    <td>{{ service.observaciones|default:"-" }}</td>
+                                    <td>{% if service.es_preventivo %}<span class="badge text-bg-info">Sí</span>{% else %}<span class="badge text-bg-light">No</span>{% endif %}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                {% empty %}
+                    <p class="text-secondary mb-0">No hay servicios registrados.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h3 class="h5 mb-4">Historial de cambios de estado</h3>
+                {% if order.status_history.all %}
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead><tr><th>Fecha y hora</th><th>Estado anterior</th><th>Estado nuevo</th></tr></thead>
+                            <tbody>
+                                {% for change in order.status_history.all %}
+                                    <tr>
+                                        <td>{{ change.fecha_hora }}</td>
+                                        <td>{{ change.get_estado_anterior_display }}</td>
+                                        <td>{{ change.get_estado_nuevo_display }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-secondary mb-0">No hay cambios de estado registrados.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

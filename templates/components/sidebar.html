@@ -16,7 +16,7 @@
             <span class="sidebar-icon">V</span>
             Vehículos
         </a>
-        <a class="sidebar-link" href="#">
+        <a class="sidebar-link {% if request.resolver_match.namespace == 'service_orders' %}active{% endif %}" href="{% url 'service_orders:list' %}">
             <span class="sidebar-icon">O</span>
             Órdenes de servicio
         </a>
