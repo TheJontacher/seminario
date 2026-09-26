@@ -26,7 +26,7 @@
                 </div>
                 <dl class="row mb-0">
                     <dt class="col-sm-5 text-secondary">Vehículo</dt>
-                    <dd class="col-sm-7">{{ order.vehicle.placa }} · {{ order.vehicle.marca }} {{ order.vehicle.modelo }}</dd>
+                    <dd class="col-sm-7"><a href="{% url 'vehicles:detail' order.vehicle.pk %}">{{ order.vehicle.placa }} · {{ order.vehicle.marca }} {{ order.vehicle.modelo }}</a></dd>
                     <dt class="col-sm-5 text-secondary">Propietario</dt>
                     <dd class="col-sm-7">{{ order.vehicle.owner.nombre }}</dd>
                     <dt class="col-sm-5 text-secondary">Mecánico</dt>

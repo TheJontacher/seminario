@@ -1,7 +1,10 @@
 from datetime import date, timedelta
 from urllib.parse import quote
+from unittest.mock import patch
 
+from django.contrib import admin
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
@@ -10,6 +13,7 @@ from maintenance.models import MaintenanceSchedule
 from vehicles.models import Vehicle
 
 from .models import Reminder
+from .views import reminder_priority
 
 
 class ReminderViewsTests(TestCase):
@@ -74,6 +78,39 @@ class ReminderViewsTests(TestCase):
 
 		self.assertEqual(reminder.estado, Reminder.Status.PENDIENTE)
 
+	def test_direct_save_requires_contacted_timestamp(self):
+		reminder = Reminder(
+			maintenance_schedule=self.schedule,
+			fecha_programada=timezone.localdate(),
+			estado=Reminder.Status.CONTACTADO,
+		)
+
+		with self.assertRaises(ValidationError):
+			reminder.save()
+
+		self.assertEqual(Reminder.objects.count(), 0)
+
+	def test_reminder_admin_disallows_historical_deletion(self):
+		self.assertFalse(admin.site._registry[Reminder].has_delete_permission(None))
+
+	def test_pending_reminder_priority_uses_django_local_date(self):
+		today = date(2026, 9, 25)
+		overdue = self.create_reminder(fecha_programada=today - timedelta(days=1))
+		due_today = self.create_reminder(fecha_programada=today)
+		future = self.create_reminder(fecha_programada=today + timedelta(days=1))
+		closed = self.create_reminder(
+			fecha_programada=today - timedelta(days=5),
+			estado=Reminder.Status.COMPLETADO,
+		)
+
+		with patch("reminders.views.timezone.localdate", return_value=today):
+			prioritized = sorted(
+				[future, closed, due_today, overdue],
+				key=reminder_priority,
+			)
+
+		self.assertEqual(prioritized, [overdue, due_today, future, closed])
+
 	def test_reminder_detail_works(self):
 		reminder = self.create_reminder()
 
@@ -82,6 +119,10 @@ class ReminderViewsTests(TestCase):
 		self.assertEqual(response.status_code, 200)
 		self.assertContains(response, "Carlos Recordatorio")
 		self.assertContains(response, "REM123")
+		self.assertContains(
+			response,
+			f'href="/mantenimiento/{self.schedule.pk}/"',
+		)
 
 	def test_edit_reminder(self):
 		reminder = self.create_reminder()

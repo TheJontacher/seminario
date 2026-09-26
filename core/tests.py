@@ -20,6 +20,11 @@ class AuthenticationTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Iniciar sesión")
 
+    def test_admin_login_redirects_to_public_login(self):
+        response = self.client.get("/admin/login/?next=/admin/")
+
+        self.assertRedirects(response, "/login/?next=%2Fadmin%2F")
+
     def test_authenticated_user_can_access_home(self):
         self.client.force_login(self.user)
 

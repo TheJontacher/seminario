@@ -1,9 +1,15 @@
 from django.contrib import admin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import include, path
+from django.views.generic import RedirectView
 
 
 urlpatterns = [
+    path(
+        "admin/login/",
+        RedirectView.as_view(url="/login/", query_string=True),
+        name="admin-login-redirect",
+    ),
     path("admin/", admin.site.urls),
     path(
         "login/",

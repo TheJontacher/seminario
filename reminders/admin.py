@@ -17,3 +17,6 @@ class ReminderAdmin(admin.ModelAdmin):
 		"maintenance_schedule__vehicle__placa",
 		"maintenance_schedule__vehicle__owner__nombre",
 	)
+
+	def has_delete_permission(self, request, obj=None):
+		return False

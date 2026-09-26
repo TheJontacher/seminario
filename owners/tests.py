@@ -1,7 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
+from django.utils import timezone
 
 from .models import Owner
+from vehicles.models import Vehicle
 
 
 class OwnerViewsTests(TestCase):
@@ -59,6 +61,28 @@ class OwnerViewsTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Empresa de prueba")
+
+    def test_owner_vehicle_links_to_vehicle_detail(self):
+        owner = Owner.objects.create(
+            tipo=Owner.OwnerType.PERSONA,
+            nombre="Propietario con vehículo",
+            telefono="3000000000",
+        )
+        vehicle = Vehicle.objects.create(
+            owner=owner,
+            tipo="MOTOCICLETA",
+            marca="Honda",
+            modelo="CB190R",
+            anio=timezone.now().year,
+            placa="OWN123",
+            kilometraje_actual=0,
+            estado="ACTIVO",
+            perfil_uso=Vehicle.UsageProfile.NORMAL,
+        )
+
+        response = self.client.get(f"/propietarios/{owner.pk}/")
+
+        self.assertContains(response, f'href="/vehiculos/{vehicle.pk}/"')
 
     def test_invalid_owner_form_does_not_save(self):
         invalid_data = {**self.owner_data, "nombre": ""}

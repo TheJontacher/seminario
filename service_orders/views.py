@@ -251,11 +251,14 @@ def global_history(request):
 		orders = orders.filter(fecha_ingreso__lte=date_to)
 	orders = orders.order_by("-fecha_ingreso", "-created_at")
 	page_obj = Paginator(orders, 25).get_page(request.GET.get("page"))
+	pagination_parameters = request.GET.copy()
+	pagination_parameters.pop("page", None)
 	return render(
 		request,
 		"service_orders/global_history.html",
 		{
 			"page_obj": page_obj,
+			"pagination_query": pagination_parameters.urlencode(),
 			"orders": page_obj.object_list,
 			"plate": plate,
 			"owner_search": owner,

@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import VehicleForm
 from .models import Vehicle
+from maintenance.models import MaintenanceSchedule
 from service_orders.models import ServiceOrder
 
 
@@ -54,7 +55,10 @@ def vehicle_detail(request, pk):
 	vehicle = get_object_or_404(
 		Vehicle.objects.select_related("owner").prefetch_related(
 			Prefetch("service_orders", queryset=orders),
-			"maintenance_schedules",
+			Prefetch(
+				"maintenance_schedules",
+				queryset=MaintenanceSchedule.objects.select_related("vehicle"),
+			),
 		),
 		pk=pk,
 	)

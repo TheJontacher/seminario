@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -108,6 +109,11 @@ class ServiceOrderModelTests(TestCase):
 		with self.assertRaises(ValidationError):
 			order.save()
 
+	def test_admin_prevents_bulk_deletion_of_historical_records(self):
+		for model in (ServiceOrder, ServicePerformed, OrderStatusHistory):
+			with self.subTest(model=model.__name__):
+				self.assertFalse(admin.site._registry[model].has_delete_permission(None))
+
 
 class ServiceOrderViewsTests(TestCase):
 	def setUp(self):
@@ -167,6 +173,7 @@ class ServiceOrderViewsTests(TestCase):
 		self.assertEqual(response.status_code, 200)
 		self.assertContains(response, "ORD123")
 		self.assertContains(response, "Propietario de orden")
+		self.assertContains(response, f'href="/vehiculos/{order.vehicle_id}/"')
 
 	def test_edit_valid_order(self):
 		order = self.create_order()
@@ -360,6 +367,18 @@ class MechanicAndGlobalHistoryTests(TestCase):
 
 		self.assertEqual(response.context["orders"][0].vehicle.placa, "NEWER1")
 		self.assertEqual(response.context["orders"][1].vehicle.placa, "OLDER1")
+
+	def test_global_history_pagination_advances_and_preserves_filters(self):
+		for index in range(26):
+			self.create_order(plate=f"PAGE{index:03d}")
+
+		first_page = self.client.get("/historial/?estado=RECIBIDO")
+		second_page = self.client.get("/historial/?estado=RECIBIDO&page=2")
+
+		self.assertEqual(first_page.context["page_obj"].number, 1)
+		self.assertContains(first_page, "?estado=RECIBIDO&amp;page=2")
+		self.assertEqual(second_page.context["page_obj"].number, 2)
+		self.assertEqual(len(second_page.context["orders"]), 1)
 
 	def test_vehicle_order_history_includes_mechanic_services_and_detail_link(self):
 		order = self.create_order(plate="VEHIST1")

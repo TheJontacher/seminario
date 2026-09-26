@@ -10,7 +10,7 @@
     <dt class="col-sm-5 text-secondary">Teléfono</dt><dd class="col-sm-7">{{ reminder.maintenance_schedule.vehicle.owner.telefono|default:"-" }}</dd>
     <dt class="col-sm-5 text-secondary">Vehículo</dt><dd class="col-sm-7">{{ reminder.maintenance_schedule.vehicle.marca }} {{ reminder.maintenance_schedule.vehicle.modelo }}</dd>
     <dt class="col-sm-5 text-secondary">Placa</dt><dd class="col-sm-7">{{ reminder.maintenance_schedule.vehicle.placa }}</dd>
-    <dt class="col-sm-5 text-secondary">Servicio</dt><dd class="col-sm-7">{{ reminder.maintenance_schedule.nombre_servicio }}</dd>
+    <dt class="col-sm-5 text-secondary">Servicio</dt><dd class="col-sm-7"><a href="{% url 'maintenance:detail' reminder.maintenance_schedule.pk %}">{{ reminder.maintenance_schedule.nombre_servicio }}</a></dd>
     <dt class="col-sm-5 text-secondary">Próxima fecha</dt><dd class="col-sm-7">{{ reminder.maintenance_schedule.proxima_fecha|default:"-" }}</dd>
     <dt class="col-sm-5 text-secondary">Próximo kilometraje</dt><dd class="col-sm-7">{{ reminder.maintenance_schedule.proximo_kilometraje|default:"-" }}</dd>
     <dt class="col-sm-5 text-secondary">Fecha del recordatorio</dt><dd class="col-sm-7">{{ reminder.fecha_programada }}</dd>

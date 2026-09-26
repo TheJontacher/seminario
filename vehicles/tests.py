@@ -136,6 +136,7 @@ class VehicleViewsTests(TestCase):
 		self.assertEqual(response.status_code, 200)
 		self.assertContains(response, "Propietario de prueba")
 		self.assertContains(response, "CB190R")
+		self.assertContains(response, f'href="/propietarios/{self.owner.pk}/"')
 
 	def test_invalid_vehicle_form_does_not_save(self):
 		invalid_data = {**self.vehicle_data, "anio": timezone.now().year + 2}

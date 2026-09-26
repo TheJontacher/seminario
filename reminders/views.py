@@ -1,10 +1,7 @@
-from datetime import date
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.db.models import Q
-from django.http import HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
@@ -24,9 +21,10 @@ def reminder_queryset():
 def reminder_priority(reminder):
 	if reminder.estado != Reminder.Status.PENDIENTE:
 		return 3
-	if reminder.fecha_programada < date.today():
+	today = timezone.localdate()
+	if reminder.fecha_programada < today:
 		return 0
-	if reminder.fecha_programada == date.today():
+	if reminder.fecha_programada == today:
 		return 1
 	return 2
 

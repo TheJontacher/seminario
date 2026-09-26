@@ -43,7 +43,7 @@
             <tbody>
                 {% for schedule in schedules %}
                     <tr>
-                        <td class="fw-semibold">{{ schedule.vehicle.placa }}</td>
+                        <td class="fw-semibold"><a href="{% url 'vehicles:detail' schedule.vehicle.pk %}">{{ schedule.vehicle.placa }}</a></td>
                         <td>{{ schedule.vehicle.owner.nombre }}</td>
                         <td>{{ schedule.nombre_servicio }}</td>
                         <td>{{ schedule.proximo_kilometraje|default:"-" }}</td>

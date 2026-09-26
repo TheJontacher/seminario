@@ -45,7 +45,7 @@
                     <div class="list-group list-group-flush">
                         {% for vehicle in owner.vehicles.all %}
                             <div class="list-group-item px-0">
-                                <div class="fw-semibold">{{ vehicle.placa }}</div>
+                                <div class="fw-semibold"><a href="{% url 'vehicles:detail' vehicle.pk %}">{{ vehicle.placa }}</a></div>
                                 <div class="small text-secondary">{{ vehicle.marca }} {{ vehicle.modelo }} · {{ vehicle.anio }}</div>
                             </div>
                         {% endfor %}

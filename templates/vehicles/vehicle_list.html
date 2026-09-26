@@ -49,7 +49,7 @@
                         <td>{{ vehicle.tipo }}</td>
                         <td>{{ vehicle.marca }}</td>
                         <td>{{ vehicle.modelo }}</td>
-                        <td>{{ vehicle.owner.nombre }}</td>
+                        <td><a href="{% url 'owners:detail' vehicle.owner.pk %}">{{ vehicle.owner.nombre }}</a></td>
                         <td>{{ vehicle.kilometraje_actual }}</td>
                         <td>{{ vehicle.estado }}</td>
                         <td class="text-end text-nowrap">

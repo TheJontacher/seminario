@@ -209,6 +209,7 @@ class MaintenanceScheduleViewsTests(TestCase):
 		self.assertEqual(response.status_code, 200)
 		self.assertContains(response, "WEB123")
 		self.assertContains(response, "Cambio de aceite")
+		self.assertContains(response, f'href="/vehiculos/{self.vehicle.pk}/"')
 
 	def test_invalid_schedule_form_does_not_save(self):
 		data = {**self.schedule_data, "intervalo_km": "", "intervalo_dias": ""}
@@ -250,3 +251,18 @@ class MaintenanceScheduleViewsTests(TestCase):
 		response = self.client.get("/")
 
 		self.assertContains(response, "Mantenimientos próximos")
+
+	def test_inactive_maintenance_is_excluded_from_dashboard_alert_counts(self):
+		data = self.schedule_data_for_model()
+		data.update(
+			nombre_servicio="Plan inactivo vencido",
+			intervalo_km=100,
+			ultimo_kilometraje=4000,
+			activo=False,
+		)
+		MaintenanceSchedule.objects.create(**data)
+
+		response = self.client.get("/")
+
+		self.assertEqual(response.context["overdue_maintenance"], 0)
+		self.assertNotContains(response, "Plan inactivo vencido")

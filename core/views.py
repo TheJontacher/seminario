@@ -21,7 +21,9 @@ def home(request):
         finished=Count("id", filter=Q(estado=ServiceOrder.Status.TERMINADO)),
     )
     schedules = list(
-        MaintenanceSchedule.objects.select_related("vehicle", "vehicle__owner")
+        MaintenanceSchedule.objects.filter(activo=True).select_related(
+            "vehicle", "vehicle__owner"
+        )
     )
     status_priority = {
         MaintenanceSchedule.MaintenanceStatus.VENCIDO: 0,

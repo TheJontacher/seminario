@@ -46,7 +46,7 @@
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-body p-4">
                 <h3 class="h5 mb-4">Propietario</h3>
-                <p class="mb-1 fw-semibold">{{ vehicle.owner.nombre }}</p>
+                <p class="mb-1 fw-semibold"><a href="{% url 'owners:detail' vehicle.owner.pk %}">{{ vehicle.owner.nombre }}</a></p>
                 <p class="mb-0 text-secondary">{{ vehicle.owner.telefono }}{% if vehicle.owner.email %} · {{ vehicle.owner.email }}{% endif %}</p>
             </div>
         </div>

@@ -59,8 +59,8 @@
                 {% for order in orders %}
                     <tr>
                         <td class="fw-semibold">#{{ order.pk }}</td>
-                        <td>{{ order.vehicle.placa }}</td>
-                        <td>{{ order.vehicle.owner.nombre }}</td>
+                        <td><a href="{% url 'vehicles:detail' order.vehicle.pk %}">{{ order.vehicle.placa }}</a></td>
+                        <td><a href="{% url 'owners:detail' order.vehicle.owner.pk %}">{{ order.vehicle.owner.nombre }}</a></td>
                         <td>{{ order.fecha_ingreso }}</td>
                         <td>{{ order.kilometraje_ingreso }}</td>
                         <td>{{ order.mechanic|default:"-" }}</td>

@@ -45,6 +45,10 @@ class Reminder(models.Model):
 				{"contactado_at": "Un recordatorio contactado debe registrar la fecha."}
 			)
 
+	def save(self, *args, **kwargs):
+		self.full_clean()
+		super().save(*args, **kwargs)
+
 	def delete(self, *args, **kwargs):
 		raise ValidationError("Los recordatorios históricos no se eliminan.")
 
