@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Historial global | TallerService{% endblock %}
+
+{% block content %}
+<section class="page-heading"><div><p class="eyebrow mb-1">Registro del taller</p><h2 class="page-title">Historial global</h2></div></section>
+<div class="card border-0 shadow-sm">
+    <div class="card-body border-bottom"><form class="row g-2" method="get">
+        <div class="col-md-2"><label class="visually-hidden" for="history-plate">Placa</label><input class="form-control" id="history-plate" name="placa" value="{{ plate }}" placeholder="Placa"></div>
+        <div class="col-md-2"><label class="visually-hidden" for="history-owner">Propietario</label><input class="form-control" id="history-owner" name="propietario" value="{{ owner_search }}" placeholder="Propietario"></div>
+        <div class="col-md-2"><label class="visually-hidden" for="history-mechanic">Mecánico</label><select class="form-select" id="history-mechanic" name="mecanico"><option value="">Todos mecánicos</option>{% for mechanic in mechanics %}<option value="{{ mechanic.pk }}" {% if mechanic_id == mechanic.pk|stringformat:"s" %}selected{% endif %}>{{ mechanic.nombre }}</option>{% endfor %}</select></div>
+        <div class="col-md-2"><label class="visually-hidden" for="history-status">Estado</label><select class="form-select" id="history-status" name="estado"><option value="">Todos estados</option>{% for value, label in status_choices %}<option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+        <div class="col-md-2"><label class="visually-hidden" for="history-from">Desde</label><input class="form-control" type="date" id="history-from" name="desde" value="{{ date_from }}" aria-label="Desde"></div>
+        <div class="col-md-2"><label class="visually-hidden" for="history-to">Hasta</label><input class="form-control" type="date" id="history-to" name="hasta" value="{{ date_to }}" aria-label="Hasta"></div>
+        <div class="col-auto"><button class="btn btn-outline-primary" type="submit">Filtrar</button></div>
+        {% if plate or owner_search or mechanic_id or status or date_from or date_to %}<div class="col-auto"><a class="btn btn-link" href="{% url 'history' %}">Limpiar</a></div>{% endif %}
+    </form></div>
+    <div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th>Fecha</th><th>Propietario</th><th>Vehículo</th><th>Placa</th><th>Kilometraje</th><th>Mecánico</th><th>Estado</th><th>Servicios</th><th></th></tr></thead><tbody>
+        {% for order in orders %}<tr><td>{{ order.fecha_ingreso }}</td><td>{{ order.vehicle.owner.nombre }}</td><td>{{ order.vehicle.marca }} {{ order.vehicle.modelo }}</td><td class="fw-semibold">{{ order.vehicle.placa }}</td><td>{{ order.kilometraje_ingreso }}</td><td>{{ order.mechanic|default:"-" }}</td><td>{{ order.get_estado_display }}</td><td>{{ order.service_count }}</td><td class="text-end"><a class="btn btn-sm btn-outline-secondary" href="{% url 'service_orders:detail' order.pk %}">Ver</a></td></tr>
+        {% empty %}<tr><td colspan="9" class="text-center text-secondary py-5">No hay órdenes para mostrar.</td></tr>{% endfor %}
+    </tbody></table></div>
+    {% if page_obj.paginator.num_pages > 1 %}<nav class="p-3" aria-label="Paginación del historial"><ul class="pagination justify-content-end mb-0">
+        {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?{{ request.GET.urlencode }}&page={{ page_obj.previous_page_number }}">Anterior</a></li>{% else %}<li class="page-item disabled"><span class="page-link">Anterior</span></li>{% endif %}
+        <li class="page-item disabled"><span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
+        {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?{{ request.GET.urlencode }}&page={{ page_obj.next_page_number }}">Siguiente</a></li>{% else %}<li class="page-item disabled"><span class="page-link">Siguiente</span></li>{% endif %}
+    </ul></nav>{% endif %}
+</div>
+{% endblock %}

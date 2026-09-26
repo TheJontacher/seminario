@@ -1,6 +1,18 @@
 from django import forms
 
-from .models import ServiceOrder, ServicePerformed
+from .models import Mechanic, ServiceOrder, ServicePerformed
+
+
+class MechanicForm(forms.ModelForm):
+    class Meta:
+        model = Mechanic
+        fields = ["nombre", "telefono", "activo"]
+        labels = {"nombre": "Nombre", "telefono": "Teléfono", "activo": "Activo"}
+        widgets = {
+            "nombre": forms.TextInput(attrs={"class": "form-control"}),
+            "telefono": forms.TextInput(attrs={"class": "form-control"}),
+            "activo": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }
 
 
 class ServicePerformedForm(forms.ModelForm):

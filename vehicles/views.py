@@ -1,10 +1,11 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.db.models import Count, Prefetch, Q
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import VehicleForm
 from .models import Vehicle
+from service_orders.models import ServiceOrder
 
 
 @login_required
@@ -44,9 +45,16 @@ def vehicle_create(request):
 
 @login_required
 def vehicle_detail(request, pk):
+	orders = (
+		ServiceOrder.objects.select_related("mechanic")
+		.prefetch_related("services_performed")
+		.annotate(service_count=Count("services_performed"))
+		.order_by("-fecha_ingreso", "-created_at")
+	)
 	vehicle = get_object_or_404(
 		Vehicle.objects.select_related("owner").prefetch_related(
-			"service_orders", "maintenance_schedules"
+			Prefetch("service_orders", queryset=orders),
+			"maintenance_schedules",
 		),
 		pk=pk,
 	)

@@ -16,5 +16,7 @@ urlpatterns = [
     path("ordenes/", include("service_orders.urls")),
     path("mantenimiento/", include("maintenance.urls")),
     path("recordatorios/", include("reminders.urls")),
+    path("mecanicos/", include("service_orders.mechanic_urls")),
+    path("historial/", include("service_orders.history_urls")),
     path("", include("core.urls")),
 ]

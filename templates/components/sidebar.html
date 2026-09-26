@@ -28,11 +28,11 @@
             <span class="sidebar-icon">R</span>
             Recordatorios
         </a>
-        <a class="sidebar-link" href="#">
+        <a class="sidebar-link {% if request.resolver_match.namespace == 'mechanics' %}active{% endif %}" href="{% url 'mechanics:list' %}">
             <span class="sidebar-icon">T</span>
             Mecánicos
         </a>
-        <a class="sidebar-link" href="#">
+        <a class="sidebar-link {% if request.resolver_match.url_name == 'history' %}active{% endif %}" href="{% url 'history' %}">
             <span class="sidebar-icon">H</span>
             Historial
         </a>

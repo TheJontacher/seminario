@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -6,7 +8,7 @@ from django.utils import timezone
 from owners.models import Owner
 from vehicles.models import Vehicle
 
-from .models import OrderStatusHistory, ServiceOrder, ServicePerformed
+from .models import Mechanic, OrderStatusHistory, ServiceOrder, ServicePerformed
 
 
 class ServiceOrderModelTests(TestCase):
@@ -209,6 +211,165 @@ class ServiceOrderViewsTests(TestCase):
 
 		self.assertEqual(response.status_code, 200)
 		self.assertContains(response, "no puede modificarse")
+
+
+class MechanicAndGlobalHistoryTests(TestCase):
+	def setUp(self):
+		self.user = get_user_model().objects.create_user(
+			username="usuario_historial",
+			password="contrasena-segura",
+		)
+		self.client.force_login(self.user)
+		self.owner = Owner.objects.create(
+			tipo=Owner.OwnerType.PERSONA,
+			nombre="Propietaria Historial",
+			telefono="3001112233",
+		)
+		self.mechanic = Mechanic.objects.create(
+			nombre="Mecánico de prueba",
+			telefono="3005556677",
+		)
+		self.vehicle_number = 0
+
+	def create_vehicle(self, *, plate=None, owner=None):
+		self.vehicle_number += 1
+		return Vehicle.objects.create(
+			owner=owner or self.owner,
+			tipo="MOTOCICLETA",
+			marca="Honda",
+			modelo="CB190R",
+			anio=timezone.now().year,
+			placa=plate or f"HST{self.vehicle_number:03d}",
+			kilometraje_actual=1000,
+			estado="ACTIVO",
+			perfil_uso=Vehicle.UsageProfile.NORMAL,
+		)
+
+	def create_order(self, *, plate=None, owner=None, status=ServiceOrder.Status.RECIBIDO, order_date=None, mechanic=None):
+		vehicle = self.create_vehicle(plate=plate, owner=owner)
+		return ServiceOrder.objects.create(
+			vehicle=vehicle,
+			mechanic=mechanic or self.mechanic,
+			fecha_ingreso=order_date or timezone.localdate(),
+			kilometraje_ingreso=1000,
+			motivo_ingreso="Revisión de taller",
+			estado=status,
+		)
+
+	def test_mechanic_list_requires_login(self):
+		self.client.logout()
+
+		response = self.client.get("/mecanicos/")
+
+		self.assertRedirects(response, "/login/?next=/mecanicos/")
+
+	def test_create_mechanic(self):
+		response = self.client.post(
+			"/mecanicos/nuevo/",
+			{"nombre": "Nuevo mecánico", "telefono": "3001234567", "activo": "on"},
+		)
+
+		mechanic = Mechanic.objects.get(nombre="Nuevo mecánico")
+		self.assertRedirects(response, f"/mecanicos/{mechanic.pk}/")
+
+	def test_edit_mechanic(self):
+		response = self.client.post(
+			f"/mecanicos/{self.mechanic.pk}/editar/",
+			{"nombre": "Nombre actualizado", "telefono": "", "activo": "on"},
+		)
+
+		self.mechanic.refresh_from_db()
+		self.assertRedirects(response, f"/mecanicos/{self.mechanic.pk}/")
+		self.assertEqual(self.mechanic.nombre, "Nombre actualizado")
+
+	def test_mechanic_detail_displays_order_totals(self):
+		self.create_order(status=ServiceOrder.Status.RECIBIDO)
+		self.create_order(status=ServiceOrder.Status.ENTREGADO)
+
+		response = self.client.get(f"/mecanicos/{self.mechanic.pk}/")
+
+		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response.context["mechanic"].total_orders, 2)
+		self.assertEqual(response.context["mechanic"].active_orders, 1)
+		self.assertEqual(response.context["mechanic"].delivered_orders, 1)
+
+	def test_mechanic_list_shows_assigned_order_count(self):
+		self.create_order()
+		self.create_order()
+
+		response = self.client.get("/mecanicos/")
+
+		listed_mechanic = response.context["mechanics"].get(pk=self.mechanic.pk)
+		self.assertEqual(listed_mechanic.order_count, 2)
+
+	def test_global_history_requires_login(self):
+		self.client.logout()
+
+		response = self.client.get("/historial/")
+
+		self.assertRedirects(response, "/login/?next=/historial/")
+
+	def test_global_history_displays_orders_including_delivered(self):
+		self.create_order(status=ServiceOrder.Status.ENTREGADO, plate="DONE01")
+
+		response = self.client.get("/historial/")
+
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, "DONE01")
+		self.assertContains(response, "Entregado")
+
+	def test_global_history_filters_by_plate(self):
+		self.create_order(plate="FIND01")
+		self.create_order(plate="OTHER1")
+
+		response = self.client.get("/historial/?placa=FIND")
+
+		self.assertEqual(len(response.context["orders"]), 1)
+		self.assertEqual(response.context["orders"][0].vehicle.placa, "FIND01")
+
+	def test_global_history_filters_by_owner(self):
+		other_owner = Owner.objects.create(
+			tipo=Owner.OwnerType.PERSONA,
+			nombre="Otra Persona",
+			telefono="3003334444",
+		)
+		self.create_order(owner=other_owner, plate="OWNER1")
+		self.create_order(plate="OWNER2")
+
+		response = self.client.get("/historial/?propietario=Otra")
+
+		self.assertEqual(len(response.context["orders"]), 1)
+		self.assertEqual(response.context["orders"][0].vehicle.placa, "OWNER1")
+
+	def test_global_history_filters_by_status(self):
+		self.create_order(status=ServiceOrder.Status.ENTREGADO, plate="STATUS1")
+		self.create_order(status=ServiceOrder.Status.RECIBIDO, plate="STATUS2")
+
+		response = self.client.get("/historial/?estado=ENTREGADO")
+
+		self.assertEqual(len(response.context["orders"]), 1)
+		self.assertEqual(response.context["orders"][0].estado, ServiceOrder.Status.ENTREGADO)
+
+	def test_global_history_orders_by_date_descending(self):
+		older_date = timezone.localdate() - timedelta(days=4)
+		newer_date = timezone.localdate() - timedelta(days=1)
+		self.create_order(order_date=older_date, plate="OLDER1")
+		self.create_order(order_date=newer_date, plate="NEWER1")
+
+		response = self.client.get("/historial/")
+
+		self.assertEqual(response.context["orders"][0].vehicle.placa, "NEWER1")
+		self.assertEqual(response.context["orders"][1].vehicle.placa, "OLDER1")
+
+	def test_vehicle_order_history_includes_mechanic_services_and_detail_link(self):
+		order = self.create_order(plate="VEHIST1")
+		ServicePerformed.objects.create(service_order=order, nombre="Servicio visible")
+
+		response = self.client.get(f"/vehiculos/{order.vehicle_id}/")
+
+		self.assertContains(response, "Mecánico de prueba")
+		self.assertContains(response, "Servicio visible")
+		self.assertContains(response, f"/ordenes/{order.pk}/")
 
 	def test_add_service_valid(self):
 		order = self.create_order()

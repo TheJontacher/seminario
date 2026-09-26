@@ -56,13 +56,16 @@
                 {% if vehicle.service_orders.all %}
                     <div class="table-responsive">
                         <table class="table table-sm align-middle mb-0">
-                            <thead><tr><th>Fecha</th><th>Kilometraje</th><th>Estado</th></tr></thead>
+                            <thead><tr><th>Fecha</th><th>Kilometraje</th><th>Estado</th><th>Mecánico</th><th>Servicios</th><th></th></tr></thead>
                             <tbody>
                                 {% for order in vehicle.service_orders.all %}
                                     <tr>
                                         <td>{{ order.fecha_ingreso }}</td>
                                         <td>{{ order.kilometraje_ingreso }}</td>
                                         <td>{{ order.get_estado_display }}</td>
+                                        <td>{{ order.mechanic|default:"-" }}</td>
+                                        <td>{% for service in order.services_performed.all %}{% if not forloop.first %}, {% endif %}{{ service.nombre }}{% empty %}-{% endfor %}</td>
+                                        <td><a class="btn btn-sm btn-outline-secondary" href="{% url 'service_orders:detail' order.pk %}">Ver orden</a></td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
