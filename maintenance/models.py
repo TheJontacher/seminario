@@ -75,6 +75,9 @@ class MaintenanceSchedule(models.Model):
 	def status(self):
 		return self.get_status()
 
+	def get_status_display(self):
+		return self.MaintenanceStatus(self.get_status()).label
+
 	def get_status(self, *, current_date=None, current_mileage=None):
 		current_date = current_date or timezone.localdate()
 		if current_mileage is None:

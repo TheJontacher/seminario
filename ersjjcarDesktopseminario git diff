@@ -1,0 +1,96 @@
+[1mdiff --git a/maintenance/models.py b/maintenance/models.py[m
+[1mindex 3167e6f..8f1feb8 100644[m
+[1m--- a/maintenance/models.py[m
+[1m+++ b/maintenance/models.py[m
+[36m@@ -75,6 +75,9 @@[m [mclass MaintenanceSchedule(models.Model):[m
+ 	def status(self):[m
+ 		return self.get_status()[m
+ [m
+[32m+[m	[32mdef get_status_display(self):[m
+[32m+[m		[32mreturn self.MaintenanceStatus(self.get_status()).label[m
+[32m+[m
+ 	def get_status(self, *, current_date=None, current_mileage=None):[m
+ 		current_date = current_date or timezone.localdate()[m
+ 		if current_mileage is None:[m
+[1mdiff --git a/templates/home.html b/templates/home.html[m
+[1mindex b097554..78d20b1 100644[m
+[1m--- a/templates/home.html[m
+[1m+++ b/templates/home.html[m
+[36m@@ -75,7 +75,7 @@[m
+                             <td>{{ schedule.vehicle.owner.nombre }}</td>[m
+                             <td>{{ schedule.nombre_servicio }}</td>[m
+                             <td>{% if schedule.proxima_fecha %}{{ schedule.proxima_fecha }}{% elif schedule.proximo_kilometraje %}{{ schedule.proximo_kilometraje }} km{% else %}-{% endif %}</td>[m
+[31m-                            <td>{% if schedule.calculated_status == 'VENCIDO' %}<span class="badge text-bg-danger">VENCIDO</span>{% elif schedule.calculated_status == 'PROXIMO' %}<span class="badge text-bg-warning">PROXIMO</span>{% else %}<span class="badge text-bg-success">AL_DIA</span>{% endif %}</td>[m
+[32m+[m[32m                            <td>{% if schedule.calculated_status == 'VENCIDO' %}<span class="badge text-bg-danger">{{ schedule.get_status_display }}</span>{% elif schedule.calculated_status == 'PROXIMO' %}<span class="badge text-bg-warning">{{ schedule.get_status_display }}</span>{% else %}<span class="badge text-bg-success">{{ schedule.get_status_display }}</span>{% endif %}</td>[m
+                         </tr>[m
+                     {% empty %}[m
+                         <tr><td colspan="5" class="text-center text-secondary py-4">No hay mantenimientos programados.</td></tr>[m
+[1mdiff --git a/templates/maintenance/schedule_detail.html b/templates/maintenance/schedule_detail.html[m
+[1mindex be5bae2..d394a24 100644[m
+[1m--- a/templates/maintenance/schedule_detail.html[m
+[1m+++ b/templates/maintenance/schedule_detail.html[m
+[36m@@ -6,7 +6,7 @@[m
+ <section class="page-heading"><div><p class="eyebrow mb-1">Detalle de mantenimiento</p><h2 class="page-title">{{ schedule.nombre_servicio }}</h2></div><div class="d-flex gap-2"><a class="btn btn-outline-secondary" href="{% url 'maintenance:list' %}">Volver</a><a class="btn btn-primary" href="{% url 'maintenance:update' schedule.pk %}">Editar</a></div></section>[m
+ <div class="row g-4">[m
+     <div class="col-lg-7"><div class="card border-0 shadow-sm h-100"><div class="card-body p-4">[m
+[31m-        <div class="d-flex justify-content-between align-items-center mb-4"><h3 class="h5 mb-0">Datos del plan</h3>{% if schedule.calculated_status == 'VENCIDO' %}<span class="badge text-bg-danger">VENCIDO</span>{% elif schedule.calculated_status == 'PROXIMO' %}<span class="badge text-bg-warning">PROXIMO</span>{% else %}<span class="badge text-bg-success">AL_DIA</span>{% endif %}</div>[m
+[32m+[m[32m        <div class="d-flex justify-content-between align-items-center mb-4"><h3 class="h5 mb-0">Datos del plan</h3>{% if schedule.calculated_status == 'VENCIDO' %}<span class="badge text-bg-danger">{{ schedule.get_status_display }}</span>{% elif schedule.calculated_status == 'PROXIMO' %}<span class="badge text-bg-warning">{{ schedule.get_status_display }}</span>{% else %}<span class="badge text-bg-success">{{ schedule.get_status_display }}</span>{% endif %}</div>[m
+         <dl class="row mb-0">[m
+             <dt class="col-sm-5 text-secondary">Vehículo</dt><dd class="col-sm-7"><a href="{% url 'vehicles:detail' schedule.vehicle.pk %}">{{ schedule.vehicle.placa }} · {{ schedule.vehicle.marca }} {{ schedule.vehicle.modelo }}</a></dd>[m
+             <dt class="col-sm-5 text-secondary">Propietario</dt><dd class="col-sm-7">{{ schedule.vehicle.owner.nombre }}</dd>[m
+[1mdiff --git a/templates/maintenance/schedule_list.html b/templates/maintenance/schedule_list.html[m
+[1mindex 9882e85..7d6a25a 100644[m
+[1m--- a/templates/maintenance/schedule_list.html[m
+[1m+++ b/templates/maintenance/schedule_list.html[m
+[36m@@ -49,9 +49,9 @@[m
+                         <td>{{ schedule.proximo_kilometraje|default:"-" }}</td>[m
+                         <td>{{ schedule.proxima_fecha|default:"-" }}</td>[m
+                         <td>[m
+[31m-                            {% if schedule.calculated_status == 'VENCIDO' %}<span class="badge text-bg-danger">VENCIDO</span>[m
+[31m-                            {% elif schedule.calculated_status == 'PROXIMO' %}<span class="badge text-bg-warning">PROXIMO</span>[m
+[31m-                            {% else %}<span class="badge text-bg-success">AL_DIA</span>{% endif %}[m
+[32m+[m[32m                            {% if schedule.calculated_status == 'VENCIDO' %}<span class="badge text-bg-danger">{{ schedule.get_status_display }}</span>[m
+[32m+[m[32m                            {% elif schedule.calculated_status == 'PROXIMO' %}<span class="badge text-bg-warning">{{ schedule.get_status_display }}</span>[m
+[32m+[m[32m                            {% else %}<span class="badge text-bg-success">{{ schedule.get_status_display }}</span>{% endif %}[m
+                         </td>[m
+                         <td class="text-end text-nowrap"><a class="btn btn-sm btn-outline-secondary" href="{% url 'maintenance:detail' schedule.pk %}">Ver</a> <a class="btn btn-sm btn-outline-primary" href="{% url 'maintenance:update' schedule.pk %}">Editar</a></td>[m
+                     </tr>[m
+[1mdiff --git a/templates/reminders/reminder_detail.html b/templates/reminders/reminder_detail.html[m
+[1mindex 9935fb6..d37b734 100644[m
+[1m--- a/templates/reminders/reminder_detail.html[m
+[1m+++ b/templates/reminders/reminder_detail.html[m
+[36m@@ -14,7 +14,7 @@[m
+     <dt class="col-sm-5 text-secondary">Próxima fecha</dt><dd class="col-sm-7">{{ reminder.maintenance_schedule.proxima_fecha|default:"-" }}</dd>[m
+     <dt class="col-sm-5 text-secondary">Próximo kilometraje</dt><dd class="col-sm-7">{{ reminder.maintenance_schedule.proximo_kilometraje|default:"-" }}</dd>[m
+     <dt class="col-sm-5 text-secondary">Fecha del recordatorio</dt><dd class="col-sm-7">{{ reminder.fecha_programada }}</dd>[m
+[31m-    <dt class="col-sm-5 text-secondary">Estado</dt><dd class="col-sm-7">{% if reminder.estado == 'PENDIENTE' %}<span class="badge text-bg-warning">PENDIENTE</span>{% elif reminder.estado == 'CONTACTADO' %}<span class="badge text-bg-info">CONTACTADO</span>{% elif reminder.estado == 'COMPLETADO' %}<span class="badge text-bg-success">COMPLETADO</span>{% else %}<span class="badge text-bg-secondary">CANCELADO</span>{% endif %}</dd>[m
+[32m+[m[32m    <dt class="col-sm-5 text-secondary">Estado</dt><dd class="col-sm-7">{% if reminder.estado == 'PENDIENTE' %}<span class="badge text-bg-warning">{{ reminder.get_estado_display }}</span>{% elif reminder.estado == 'CONTACTADO' %}<span class="badge text-bg-info">{{ reminder.get_estado_display }}</span>{% elif reminder.estado == 'COMPLETADO' %}<span class="badge text-bg-success">{{ reminder.get_estado_display }}</span>{% else %}<span class="badge text-bg-secondary">{{ reminder.get_estado_display }}</span>{% endif %}</dd>[m
+     <dt class="col-sm-5 text-secondary">Mensaje</dt><dd class="col-sm-7">{{ reminder.mensaje|default:"-" }}</dd>[m
+     </dl>[m
+ </div></div></div><div class="col-lg-5"><div class="card border-0 shadow-sm"><div class="card-body p-4"><h3 class="h5 mb-3">Acciones</h3>[m
+[1mdiff --git a/templates/reminders/reminder_list.html b/templates/reminders/reminder_list.html[m
+[1mindex c7f29b0..192c853 100644[m
+[1m--- a/templates/reminders/reminder_list.html[m
+[1m+++ b/templates/reminders/reminder_list.html[m
+[36m@@ -18,7 +18,7 @@[m
+         <thead><tr><th>Fecha programada</th><th>Propietario</th><th>Vehículo</th><th>Servicio</th><th>Teléfono</th><th>Estado</th><th class="text-end">Acciones</th></tr></thead>[m
+         <tbody>{% for reminder in reminders %}<tr>[m
+             <td class="fw-semibold">{{ reminder.fecha_programada }}</td><td>{{ reminder.maintenance_schedule.vehicle.owner.nombre }}</td><td><a href="{% url 'vehicles:detail' reminder.maintenance_schedule.vehicle.pk %}">{{ reminder.maintenance_schedule.vehicle.placa }}</a></td><td><a href="{% url 'maintenance:detail' reminder.maintenance_schedule.pk %}">{{ reminder.maintenance_schedule.nombre_servicio }}</a></td><td>{{ reminder.maintenance_schedule.vehicle.owner.telefono }}</td>[m
+[31m-            <td>{% if reminder.estado == 'PENDIENTE' %}<span class="badge text-bg-warning">PENDIENTE</span>{% elif reminder.estado == 'CONTACTADO' %}<span class="badge text-bg-info">CONTACTADO</span>{% elif reminder.estado == 'COMPLETADO' %}<span class="badge text-bg-success">COMPLETADO</span>{% else %}<span class="badge text-bg-secondary">CANCELADO</span>{% endif %}</td>[m
+[32m+[m[32m            <td>{% if reminder.estado == 'PENDIENTE' %}<span class="badge text-bg-warning">{{ reminder.get_estado_display }}</span>{% elif reminder.estado == 'CONTACTADO' %}<span class="badge text-bg-info">{{ reminder.get_estado_display }}</span>{% elif reminder.estado == 'COMPLETADO' %}<span class="badge text-bg-success">{{ reminder.get_estado_display }}</span>{% else %}<span class="badge text-bg-secondary">{{ reminder.get_estado_display }}</span>{% endif %}</td>[m
+             <td class="text-end text-nowrap"><a class="btn btn-sm btn-outline-secondary" href="{% url 'reminders:detail' reminder.pk %}">Ver</a> <a class="btn btn-sm btn-outline-primary" href="{% url 'reminders:update' reminder.pk %}">Editar</a></td>[m
+         </tr>{% empty %}<tr><td colspan="7" class="text-center text-secondary py-5">No hay recordatorios registrados.</td></tr>{% endfor %}</tbody>[m
+     </table></div>[m
+[1mdiff --git a/templates/vehicles/vehicle_detail.html b/templates/vehicles/vehicle_detail.html[m
+[1mindex a374191..71f28df 100644[m
+[1m--- a/templates/vehicles/vehicle_detail.html[m
+[1m+++ b/templates/vehicles/vehicle_detail.html[m
+[36m@@ -92,7 +92,7 @@[m
+                                         <td><a href="{% url 'maintenance:detail' schedule.pk %}">{{ schedule.nombre_servicio }}</a></td>[m
+                                         <td>{{ schedule.proximo_kilometraje|default:"-" }}</td>[m
+                                         <td>{{ schedule.proxima_fecha|default:"-" }}</td>[m
+[31m-                                        <td><span class="badge text-bg-light">{{ schedule.status }}</span></td>[m
+[32m+[m[32m                                        <td><span class="badge text-bg-light">{{ schedule.get_status_display }}</span></td>[m
+                                     </tr>[m
+                                 {% endfor %}[m
+                             </tbody>[m

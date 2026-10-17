@@ -6,7 +6,7 @@
 <section class="page-heading"><div><p class="eyebrow mb-1">Detalle de mantenimiento</p><h2 class="page-title">{{ schedule.nombre_servicio }}</h2></div><div class="d-flex gap-2"><a class="btn btn-outline-secondary" href="{% url 'maintenance:list' %}">Volver</a><a class="btn btn-primary" href="{% url 'maintenance:update' schedule.pk %}">Editar</a></div></section>
 <div class="row g-4">
     <div class="col-lg-7"><div class="card border-0 shadow-sm h-100"><div class="card-body p-4">
-        <div class="d-flex justify-content-between align-items-center mb-4"><h3 class="h5 mb-0">Datos del plan</h3>{% if schedule.calculated_status == 'VENCIDO' %}<span class="badge text-bg-danger">VENCIDO</span>{% elif schedule.calculated_status == 'PROXIMO' %}<span class="badge text-bg-warning">PROXIMO</span>{% else %}<span class="badge text-bg-success">AL_DIA</span>{% endif %}</div>
+        <div class="d-flex justify-content-between align-items-center mb-4"><h3 class="h5 mb-0">Datos del plan</h3>{% if schedule.calculated_status == 'VENCIDO' %}<span class="badge text-bg-danger">{{ schedule.get_status_display }}</span>{% elif schedule.calculated_status == 'PROXIMO' %}<span class="badge text-bg-warning">{{ schedule.get_status_display }}</span>{% else %}<span class="badge text-bg-success">{{ schedule.get_status_display }}</span>{% endif %}</div>
         <dl class="row mb-0">
             <dt class="col-sm-5 text-secondary">Vehículo</dt><dd class="col-sm-7"><a href="{% url 'vehicles:detail' schedule.vehicle.pk %}">{{ schedule.vehicle.placa }} · {{ schedule.vehicle.marca }} {{ schedule.vehicle.modelo }}</a></dd>
             <dt class="col-sm-5 text-secondary">Propietario</dt><dd class="col-sm-7">{{ schedule.vehicle.owner.nombre }}</dd>

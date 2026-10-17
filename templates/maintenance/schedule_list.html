@@ -49,9 +49,9 @@
                         <td>{{ schedule.proximo_kilometraje|default:"-" }}</td>
                         <td>{{ schedule.proxima_fecha|default:"-" }}</td>
                         <td>
-                            {% if schedule.calculated_status == 'VENCIDO' %}<span class="badge text-bg-danger">VENCIDO</span>
-                            {% elif schedule.calculated_status == 'PROXIMO' %}<span class="badge text-bg-warning">PROXIMO</span>
-                            {% else %}<span class="badge text-bg-success">AL_DIA</span>{% endif %}
+                            {% if schedule.calculated_status == 'VENCIDO' %}<span class="badge text-bg-danger">{{ schedule.get_status_display }}</span>
+                            {% elif schedule.calculated_status == 'PROXIMO' %}<span class="badge text-bg-warning">{{ schedule.get_status_display }}</span>
+                            {% else %}<span class="badge text-bg-success">{{ schedule.get_status_display }}</span>{% endif %}
                         </td>
                         <td class="text-end text-nowrap"><a class="btn btn-sm btn-outline-secondary" href="{% url 'maintenance:detail' schedule.pk %}">Ver</a> <a class="btn btn-sm btn-outline-primary" href="{% url 'maintenance:update' schedule.pk %}">Editar</a></td>
                     </tr>

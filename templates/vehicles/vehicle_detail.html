@@ -92,7 +92,7 @@
                                         <td><a href="{% url 'maintenance:detail' schedule.pk %}">{{ schedule.nombre_servicio }}</a></td>
                                         <td>{{ schedule.proximo_kilometraje|default:"-" }}</td>
                                         <td>{{ schedule.proxima_fecha|default:"-" }}</td>
-                                        <td><span class="badge text-bg-light">{{ schedule.status }}</span></td>
+                                        <td><span class="badge text-bg-light">{{ schedule.get_status_display }}</span></td>
                                     </tr>
                                 {% endfor %}
                             </tbody>

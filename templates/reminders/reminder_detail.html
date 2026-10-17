@@ -14,7 +14,7 @@
     <dt class="col-sm-5 text-secondary">Próxima fecha</dt><dd class="col-sm-7">{{ reminder.maintenance_schedule.proxima_fecha|default:"-" }}</dd>
     <dt class="col-sm-5 text-secondary">Próximo kilometraje</dt><dd class="col-sm-7">{{ reminder.maintenance_schedule.proximo_kilometraje|default:"-" }}</dd>
     <dt class="col-sm-5 text-secondary">Fecha del recordatorio</dt><dd class="col-sm-7">{{ reminder.fecha_programada }}</dd>
-    <dt class="col-sm-5 text-secondary">Estado</dt><dd class="col-sm-7">{% if reminder.estado == 'PENDIENTE' %}<span class="badge text-bg-warning">PENDIENTE</span>{% elif reminder.estado == 'CONTACTADO' %}<span class="badge text-bg-info">CONTACTADO</span>{% elif reminder.estado == 'COMPLETADO' %}<span class="badge text-bg-success">COMPLETADO</span>{% else %}<span class="badge text-bg-secondary">CANCELADO</span>{% endif %}</dd>
+    <dt class="col-sm-5 text-secondary">Estado</dt><dd class="col-sm-7">{% if reminder.estado == 'PENDIENTE' %}<span class="badge text-bg-warning">{{ reminder.get_estado_display }}</span>{% elif reminder.estado == 'CONTACTADO' %}<span class="badge text-bg-info">{{ reminder.get_estado_display }}</span>{% elif reminder.estado == 'COMPLETADO' %}<span class="badge text-bg-success">{{ reminder.get_estado_display }}</span>{% else %}<span class="badge text-bg-secondary">{{ reminder.get_estado_display }}</span>{% endif %}</dd>
     <dt class="col-sm-5 text-secondary">Mensaje</dt><dd class="col-sm-7">{{ reminder.mensaje|default:"-" }}</dd>
     </dl>
 </div></div></div><div class="col-lg-5"><div class="card border-0 shadow-sm"><div class="card-body p-4"><h3 class="h5 mb-3">Acciones</h3>
