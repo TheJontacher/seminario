@@ -56,6 +56,10 @@ class MaintenanceSchedule(models.Model):
 
 		if self.ultimo_kilometraje is not None and self.ultimo_kilometraje < 0:
 			raise ValidationError({"ultimo_kilometraje": "No puede ser negativo."})
+		if self.intervalo_km and self.ultimo_kilometraje is None:
+			raise ValidationError({"ultimo_kilometraje": "Indique el kilometraje del último servicio."})
+		if self.intervalo_dias and self.ultima_fecha is None:
+			raise ValidationError({"ultima_fecha": "Indique la fecha del último servicio."})
 
 	def save(self, *args, **kwargs):
 		self.full_clean()

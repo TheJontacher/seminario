@@ -7,11 +7,22 @@ from .models import Reminder
 class ReminderAdmin(admin.ModelAdmin):
 	list_display = (
 		"fecha_programada",
+		"tipo",
 		"maintenance_schedule",
 		"estado",
 		"contactado_at",
 	)
-	list_filter = ("estado", "fecha_programada")
+	list_filter = ("estado", "tipo", "fecha_programada")
+	readonly_fields = ("tipo", "ciclo", "estado", "contactado_at")
+
+	def has_delete_permission(self, request, obj=None):
+		return False
+
+	def get_readonly_fields(self, request, obj=None):
+		fields = super().get_readonly_fields(request, obj)
+		if obj and obj.tipo != Reminder.Type.MANUAL:
+			return (*fields, "maintenance_schedule")
+		return fields
 	search_fields = (
 		"maintenance_schedule__nombre_servicio",
 		"maintenance_schedule__vehicle__placa",

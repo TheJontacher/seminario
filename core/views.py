@@ -13,25 +13,36 @@ from vehicles.models import Vehicle
 def home(request):
     order_metrics = ServiceOrder.objects.aggregate(
         received=Count("id", filter=Q(estado=ServiceOrder.Status.RECIBIDO)),
-        in_progress=Count("id", filter=Q(estado=ServiceOrder.Status.EN_PROCESO)),
+        in_progress=Count(
+            "id",
+            filter=Q(estado=ServiceOrder.Status.EN_PROCESO),
+        ),
         stopped=Count(
             "id",
             filter=Q(estado=ServiceOrder.Status.DETENIDO_REPUESTOS),
         ),
-        finished=Count("id", filter=Q(estado=ServiceOrder.Status.TERMINADO)),
+        finished=Count(
+            "id",
+            filter=Q(estado=ServiceOrder.Status.TERMINADO),
+        ),
     )
+
     schedules = list(
         MaintenanceSchedule.objects.filter(activo=True).select_related(
-            "vehicle", "vehicle__owner"
+            "vehicle",
+            "vehicle__owner",
         )
     )
+
     status_priority = {
         MaintenanceSchedule.MaintenanceStatus.VENCIDO: 0,
         MaintenanceSchedule.MaintenanceStatus.PROXIMO: 1,
         MaintenanceSchedule.MaintenanceStatus.AL_DIA: 2,
     }
+
     for schedule in schedules:
         schedule.calculated_status = schedule.get_status()
+
     schedules = [
         schedule
         for schedule in schedules
@@ -41,17 +52,23 @@ def home(request):
             MaintenanceSchedule.MaintenanceStatus.PROXIMO,
         }
     ]
-    schedules.sort(key=lambda item: status_priority[item.calculated_status])
+
+    schedules.sort(
+        key=lambda item: status_priority[item.calculated_status]
+    )
+
     context = {
         "total_owners": Owner.objects.count(),
         "total_vehicles": Vehicle.objects.count(),
         "order_metrics": order_metrics,
         "overdue_maintenance": sum(
-            schedule.calculated_status == MaintenanceSchedule.MaintenanceStatus.VENCIDO
+            schedule.calculated_status
+            == MaintenanceSchedule.MaintenanceStatus.VENCIDO
             for schedule in schedules
         ),
         "upcoming_maintenance": sum(
-            schedule.calculated_status == MaintenanceSchedule.MaintenanceStatus.PROXIMO
+            schedule.calculated_status
+            == MaintenanceSchedule.MaintenanceStatus.PROXIMO
             for schedule in schedules
         ),
         "priority_maintenance": schedules[:5],
@@ -59,4 +76,5 @@ def home(request):
             estado=Reminder.Status.PENDIENTE
         ).count(),
     }
+
     return render(request, "home.html", context)
