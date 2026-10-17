@@ -55,6 +55,25 @@ docker compose exec postgres pg_isready -U postgres -d taller
 
 Si todavía no está listo, repite `pg_isready` después de unos segundos.
 
+### Ver la base de datos en el navegador (opcional)
+
+Inicia pgAdmin, la interfaz web para PostgreSQL:
+
+```powershell
+docker compose up -d pgadmin
+```
+
+Abre `http://127.0.0.1:5050/` e inicia sesión con el correo `admin@example.com` y el valor de `POSTGRES_PASSWORD` definido en `.env`.
+
+En pgAdmin, registra un servidor con estos datos de conexión:
+
+- **Host:** `postgres`
+- **Puerto:** `5432`
+- **Base de mantenimiento:** valor de `POSTGRES_DB` en `.env` (normalmente `taller`)
+- **Usuario y contraseña:** valores de `POSTGRES_USER` y `POSTGRES_PASSWORD` en `.env`
+
+El volumen `pgadmin_data` conserva la configuración de pgAdmin. El acceso web está limitado a esta computadora.
+
 ## Preparar y ejecutar Django
 
 Aplica las migraciones, crea un usuario de acceso y arranca el servidor:
@@ -96,5 +115,5 @@ Git descarga el código, pero no copia los datos de PostgreSQL ni los usuarios c
 ## Solución rápida de problemas
 
 - Si PowerShell no reconoce `docker`, inicia Docker Desktop y abre una terminal nueva.
-- Si el puerto `5432` está ocupado, PostgreSQL no podrá iniciar; cierra el servicio que lo usa antes de continuar.
+- Si el puerto configurado en `POSTGRES_PORT` está ocupado, cambia ese valor en `.env`; Compose usará el mismo puerto para publicar PostgreSQL.
 - Si `py` no se reconoce, reinstala Python activando **Add Python to PATH**.
